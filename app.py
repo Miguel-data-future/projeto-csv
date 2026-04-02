@@ -27,7 +27,7 @@ with open('netflix_titles.csv', 'r', encoding='utf-8') as arquivo:
 
     for row in arquivo_csv:
          cursor.execute('''
-              INSERT OR IGNORE INTO netflix (show_id, type, title, director, cast, country, date_added, release_year, rating, duration, listed_in, description)
+              INSERT OR REPLACE INTO netflix (show_id, type, title, director, cast, country, date_added, release_year, rating, duration, listed_in, description)
                 VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', row)
 

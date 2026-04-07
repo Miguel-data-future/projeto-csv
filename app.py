@@ -3,8 +3,28 @@ import csv
 import sqlite3
 from pydantic import BaseModel, ValidationError
 
+# FUNÇÕES PARA LISTAR OS TÍTULOS DISPONÍVEIS E POR TIPO
+
+def listar_titulos():
+    conexao = sqlite3.connect('netflix.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT title FROM netflix")
+    titulos = cursor.fetchall()
+    conexao.close()
+    return [titulo[0] for titulo in titulos]
+
+def listar_titulos_por_tipo(tipo):
+    conexao = sqlite3.connect('netflix.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT title FROM netflix WHERE type = ?", (tipo,))
+    titulos = cursor.fetchall()
+    conexao.close()
+    return [titulo[0] for titulo in titulos]
+
 
 # VALIDAÇÃO DE DADOS COM PYDANTIC
+
+
 class Netflix(BaseModel):
     show_id: str
     type: str
@@ -42,6 +62,7 @@ CREATE TABLE IF NOT EXISTS netflix (
 ''')
 
 # INSERÇÃO DOS DADOS DO CSV COM VALIDAÇÃO
+sucesso = True
 with open('netflix_titles.csv', 'r', encoding='utf-8-sig') as arquivo:
     arquivo_csv = csv.DictReader(arquivo)
     for row in arquivo_csv:
@@ -57,7 +78,40 @@ with open('netflix_titles.csv', 'r', encoding='utf-8-sig') as arquivo:
         except ValidationError as e:
             # IMPRIME SE HOUVER ERRO DE VALIDAÇÃO.
             print(f"Erro de validação para o registro {row['show_id']}: {e}")
+            sucesso = False
 
+if sucesso:
+    print("Todos os registros foram validados e inseridos com sucesso!")
+
+else:
+    print(" Processo concluído, mas alguns registros apresentaram erros de validação..")
 
 create_database.commit()
 create_database.close()
+
+
+pesquisa = input(
+    "Para listar os títulos disponíveis, digite 'Listar'. Para ignorar a pesquisa, digite 'Ignore': ")
+
+if pesquisa == "Listar" or pesquisa == "listar":
+    for titulo in listar_titulos():
+        print(titulo)
+
+elif pesquisa == 'ignore' or pesquisa == 'Ignore':
+    print("Pesquisa ignorada.")
+
+else:
+    print("Título não encontrado.")
+
+
+input_tipo = input(
+    "Digite o tipo de título que deseja listar (Filme ou Série): ")
+
+if input_tipo == "Filme" or input_tipo == "filme":
+    for titulo in listar_titulos_por_tipo("Movie"):
+        print(titulo)
+elif input_tipo == "Série" or input_tipo == "série":
+    for titulo in listar_titulos_por_tipo("TV Show"):
+        print(titulo)
+else:
+    print("Tipo de título não encontrado.")

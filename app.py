@@ -5,7 +5,7 @@ from pydantic import BaseModel, ValidationError
 
 # FUNÇÕES PARA LISTAR OS TÍTULOS DISPONÍVEIS E POR TIPO
 
-def listar_titulos():
+def listar_titulos(lista):
     conexao = sqlite3.connect('netflix.db')
     cursor = conexao.cursor()
     cursor.execute("SELECT title FROM netflix")
@@ -20,6 +20,14 @@ def listar_titulos_por_tipo(tipo):
     titulos = cursor.fetchall()
     conexao.close()
     return [titulo[0] for titulo in titulos]
+
+def listar_titulos_com_ano_movie():
+    conexao = sqlite3.connect('netflix.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT title, release_year FROM netflix where type = 'Movie'")
+    titulos = cursor.fetchall()
+    conexao.close()
+    return titulos
 
 
 # VALIDAÇÃO DE DADOS COM PYDANTIC
@@ -89,7 +97,7 @@ else:
 create_database.commit()
 create_database.close()
 
-
+#receber a lista de todos os itens 
 pesquisa = input(
     "Para listar os títulos disponíveis, digite 'Listar'. Para ignorar a pesquisa, digite 'Ignore': ")
 
@@ -103,7 +111,7 @@ elif pesquisa == 'ignore' or pesquisa == 'Ignore':
 else:
     print("Título não encontrado.")
 
-
+#receber a lista de itens por tipo (filme ou série)
 input_tipo = input(
     "Digite o tipo de título que deseja listar (Filme ou Série): ")
 
@@ -115,3 +123,25 @@ elif input_tipo == "Série" or input_tipo == "série":
         print(titulo)
 else:
     print("Tipo de título não encontrado.")
+
+    if input_tipo == "Filme" or input_tipo == "filme":
+          
+          input_ano = input("Digite 'Ano' para listar os títulos com ano de lançamento: ")
+
+if input_ano.lower() == "ano":
+    for titulo, ano in listar_titulos_com_ano_movie():
+        print(f"{titulo} - {ano}")
+else:
+    print("Entrada inválida.")
+
+
+
+  
+
+
+
+#receber ano de lançamento
+
+
+ 
+

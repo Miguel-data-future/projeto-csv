@@ -4,7 +4,7 @@ import sqlite3
 from pydantic import BaseModel, ValidationError
 
 
-def listar_titulos(): # FUNÇÕES PARA LISTAR OS TÍTULOS DISPONÍVEIS E POR TIPO
+def listar_titulos(): # FUNÇÃO PARA LISTAR OS TÍTULOS DISPONÍVEIS 
     conexao = sqlite3.connect('netflix.db')
     cursor = conexao.cursor()
     cursor.execute("SELECT title FROM netflix")
@@ -13,18 +13,10 @@ def listar_titulos(): # FUNÇÕES PARA LISTAR OS TÍTULOS DISPONÍVEIS E POR TIP
     return [titulo[0] for titulo in titulos]
 
 
-
-
-def listar_titulos_por_tipo(tipo): # FUNÇÕES PARA LISTAR OS TÍTULOS DISPONÍVEIS E POR TIPO 
-    conexao = sqlite3.connect('netflix.db')
-    cursor = conexao.cursor()
-    cursor.execute("SELECT title FROM netflix WHERE type = ?", (tipo,))
-    titulos = cursor.fetchall()
-    conexao.close()
     return [titulo[0] for titulo in titulos]
 
 
-def listar_titulos_com_info(tipo): 
+def listar_titulos_com_info(tipo):  # FUNÇÕES PARA LISTAR OS TÍTULOS COM INFORMAÇÕES
     conexao = sqlite3.connect('netflix.db')
     cursor = conexao.cursor()
     cursor.execute(
@@ -34,7 +26,7 @@ def listar_titulos_com_info(tipo):
     return [(titulo[0], titulo[1], titulo[2]) for titulo in titulos]
 
 
-def quant_titulos():
+def quant_titulos(): # FUNÇÃO PARA LISTAR A QUANTIDADE DE TÍTULOS DISPONÍVEIS POR TIPO (FILME)
     conexao = sqlite3.connect("netflix.db")
     cursor = conexao.cursor()
     cursor.execute("SELECT COUNT(*) FROM netflix WHERE type = 'Movie'")
@@ -42,7 +34,7 @@ def quant_titulos():
     return qtd_filmes
 
 
-def quant_titulos():
+def quant_titulos(): # FUNÇÃO PARA LISTAR A QUANTIDADE DE TÍTULOS DISPONÍVEIS POR TIPO (SÉRIE)
     conexao = sqlite3.connect("netflix.db")
     cursor = conexao.cursor()
     cursor.execute("SELECT COUNT(*) FROM netflix WHERE type = 'TV Show'")
@@ -50,7 +42,7 @@ def quant_titulos():
     return qtd_series
 
 
-def listar_paises_unicos():
+def listar_paises_unicos(): #FUNÇAO PARA LISTAR TODOS OS FILMES DE CADA PAÍS DISPONÍVEIS
     conexao = sqlite3.connect("netflix.db")
     cursor = conexao.cursor()
     cursor.execute(
@@ -66,7 +58,7 @@ def listar_paises_unicos():
     return sorted(paises_unicos)
 
 
-def listar_filmes_por_pais(pais):
+def listar_filmes_por_pais(pais): 
     conexao = sqlite3.connect("netflix.db")
     cursor = conexao.cursor()
     cursor.execute("""
@@ -79,7 +71,7 @@ def listar_filmes_por_pais(pais):
     return [filme[0] for filme in filmes]
 
 
-def listar_anos_unicos():
+def listar_anos_unicos(): #LISTAR FILMES DE CADA ANO DISPONÍVEIS
     conexao = sqlite3.connect("netflix.db")
     cursor = conexao.cursor()
     cursor.execute("SELECT DISTINCT release_year FROM netflix WHERE release_year IS NOT NULL")
@@ -102,10 +94,8 @@ def listar_filmes_por_ano(ano):
     conexao.close()
     return [filme[0] for filme in filmes]
 
-# VALIDAÇÃO DE DADOS COM PYDANTIC
 
-
-class Netflix(BaseModel):
+class Netflix(BaseModel): # VALIDAÇÃO DE DADOS COM PYDANTIC
     show_id: str
     type: str
     title: str
@@ -120,8 +110,7 @@ class Netflix(BaseModel):
     description: str | None
 
 
-# CRIAÇÃO DO BANCO DE DADOS
-create_database = sqlite3.connect('netflix.db')
+create_database = sqlite3.connect('netflix.db')# CRIAÇÃO DO BANCO DE DADOS
 cursor = create_database.cursor()
 
 cursor.execute('''
@@ -141,10 +130,9 @@ CREATE TABLE IF NOT EXISTS netflix (
 )
 ''')
 
-# INSERÇÃO DOS DADOS DO CSV COM VALIDAÇÃO
 
+sucesso = True # INSERÇÃO DOS DADOS DO CSV COM VALIDAÇÃO
 
-sucesso = True
 with open('netflix_titles.csv', 'r', encoding='utf-8-sig') as arquivo:
     arquivo_csv = csv.DictReader(arquivo)
     for row in arquivo_csv:
